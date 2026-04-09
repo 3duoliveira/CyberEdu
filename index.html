@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>CyberEdu Pro - Plataforma Educacional</title>
+    <style>
+        body { margin: 0; font-family: 'Segoe UI', Arial; background: #0f172a; color: #fff; }
+        .login { display: flex; height: 100vh; justify-content: center; align-items: center; }
+        .box { background: #1e293b; padding: 30px; border-radius: 10px; width: 320px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        input, select { width: 100%; padding: 12px; margin: 10px 0; border-radius: 5px; border: 1px solid #334155; background: #0f172a; color: #fff; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #22c55e; border: none; color: #fff; font-weight: bold; cursor: pointer; border-radius: 5px; margin-top: 10px; transition: 0.3s; }
+        button:hover { background: #16a34a; }
+        .dashboard { display: none; padding: 20px; max-width: 1100px; margin: auto; }
+        .card { background: #1e293b; padding: 20px; margin: 15px 0; border-radius: 12px; border-left: 5px solid #3b82f6; }
+        .trilha-item { display: flex; justify-content: space-between; align-items: center; background: #334155; padding: 12px; margin: 8px 0; border-radius: 8px; }
+        .btn-link { background: #3b82f6; width: auto; padding: 8px 12px; font-size: 13px; border-radius: 4px; border:none; color:white; cursor:pointer; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: #1e293b; border-radius: 8px; overflow: hidden; }
+        th, td { text-align: left; padding: 15px; border-bottom: 1px solid #334155; }
+        th { background: #334155; color: #3b82f6; }
+        .timer-badge { background: #f97316; padding: 10px 15px; border-radius: 8px; font-weight: bold; font-family: monospace; }
+        .grid-conteudo { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 768px) { .grid-conteudo { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<div class="login" id="login-screen">
+    <div class="box">
+        <h2 style="text-align: center;">🛡️ CyberEdu Pro</h2>
+        <input type="text" id="username" placeholder="Seu Nome Completo">
+        <select id="userRole">
+            <option value="aluno">Sou Aluno</option>
+            <option value="professor">Sou Professor</option>
+        </select>
+        <button onclick="fazerLogin()">Entrar</button>
+    </div>
+</div>
+
+<div class="dashboard" id="main-dashboard">
+    <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h1 id="txt-welcome"></h1>
+        <div id="area-timer" style="display:none;" class="timer-badge">
+            ⏱️ Estudo: <span id="sessao-timer">00:00</span>
+        </div>
+    </div>
+
+    <div id="area-aluno" style="display:none;">
+        <div class="grid-conteudo">
+            <div class="card">
+                <h3>🎮 Área Kids & Jogos</h3>
+                <div class="trilha-item">
+                    <span>Google Interland (Jogo 3D)</span>
+                    <button class="btn-link" onclick="registrar('Interland', 'https://beinternetawesome.withgoogle.com/pt-br_all/interland')">Jogar</button>
+                </div>
+                <div class="trilha-item">
+                    <span>Quiz: Você é Seguro Online?</span>
+                    <button class="btn-link" onclick="registrar('Quiz Segurança', 'https://www.safernet.org.br/site/prevencao/quiz')">Fazer Quiz</button>
+                </div>
+            </div>
+
+            <div class="card" style="border-left-color: #22c55e;">
+                <h3>🎓 Cursos Profissionais</h3>
+                <div class="trilha-item">
+                    <span>Cisco: Introdução ao Cyber</span>
+                    <button class="btn-link" onclick="registrar('Cisco', 'https://www.netacad.com/portal/learning')">Acessar</button>
+                </div>
+                <div class="trilha-item">
+                    <span>Hackers do Bem (Iniciante)</span>
+                    <button class="btn-link" onclick="registrar('Hackers Bem', 'https://hackersdobem.org.br/')">Acessar</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="border-left-color: #f97316;">
+            <h3>📖 Leituras Rápidas (Artigos)</h3>
+            <div class="trilha-item">
+                <span>O que é Phishing? (Guia Simples)</span>
+                <button class="btn-link" onclick="registrar('Artigo Phishing', 'https://cartilha.cert.br/fasciculos/#phishing')">Ler Agora</button>
+            </div>
+            <div class="trilha-item">
+                <span>Dicas para Senhas Fortes</span>
+                <button class="btn-link" onclick="registrar('Artigo Senhas', 'https://cartilha.cert.br/fasciculos/#senhas')">Ler Agora</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="area-professor" style="display:none;">
+        <div class="card" style="border-left-color: #ef4444;">
+            <h3>👨‍🏫 Painel de Controle do Instrutor</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Aluno</th>
+                        <th>Tempo Total</th>
+                        <th>Última Atividade</th>
+                        <th>Nota</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody id="lista-alunos-prof"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <button onclick="encerrarSessao()" style="background: #ef4444; width: 150px; margin-top:30px;">Salvar e Sair</button>
+</div>
+
+<script>
+    let segundosAtuais = 0;
+    let timerInterval;
+    let usuarioLogado = null;
+    let papelLogado = null;
+
+    // Carrega dados ou inicia com o seu grupo do MBA
+    let db = JSON.parse(localStorage.getItem('cyberedu_v3')) || [
+        { nome: "Fabricio Reis", tempo: 3600, atividade: "Cisco", nota: "9.5" },
+        { nome: "Fernando Caldas", tempo: 1800, atividade: "Interland", nota: "8.0" }
+    ];
+
+    function fazerLogin() {
+        usuarioLogado = document.getElementById('username').value;
+        papelLogado = document.getElementById('userRole').value;
+        if (!usuarioLogado) return alert("Digite seu nome!");
+
+        let alunoExistente = db.find(a => a.nome === usuarioLogado);
+        if (papelLogado === 'aluno' && !alunoExistente) {
+            db.push({ nome: usuarioLogado, tempo: 0, atividade: "Nenhuma", nota: "0" });
+            salvarDB();
+        }
+
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('main-dashboard').style.display = 'block';
+        document.getElementById('txt-welcome').innerText = `Olá, ${usuarioLogado}!`;
+
+        if (papelLogado === 'aluno') {
+            document.getElementById('area-aluno').style.display = 'block';
+            document.getElementById('area-timer').style.display = 'block';
+            iniciarCronometro();
+        } else {
+            document.getElementById('area-professor').style.display = 'block';
+            renderizarProfessor();
+        }
+    }
+
+    function iniciarCronometro() {
+        timerInterval = setInterval(() => {
+            segundosAtuais++;
+            document.getElementById('sessao-timer').innerText = formatarTempo(segundosAtuais);
+        }, 1000);
+    }
+
+    function formatarTempo(s) {
+        let h = Math.floor(s / 3600);
+        let m = Math.floor((s % 3600) / 60);
+        let seg = s % 60;
+        return `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${seg.toString().padStart(2,'0')}`;
+    }
+
+    function registrar(curso, url) {
+        let index = db.findIndex(a => a.nome === usuarioLogado);
+        if (index !== -1) {
+            db[index].atividade = curso;
+            salvarDB();
+        }
+        window.open(url, '_blank');
+    }
+
+    function renderizarProfessor() {
+        const tabela = document.getElementById('lista-alunos-prof');
+        tabela.innerHTML = "";
+        db.forEach((aluno, i) => {
+            tabela.innerHTML += `
+                <tr>
+                    <td><b>${aluno.nome}</b></td>
+                    <td>${formatarTempo(aluno.tempo)}</td>
+                    <td>${aluno.atividade}</td>
+                    <td><input type="number" id="n-${i}" value="${aluno.nota}" style="width:50px; background:#0f172a; color:white; border:1px solid #334155; padding:5px;"></td>
+                    <td><button onclick="atribuirNota(${i})" style="background:#3b82f6; border:none; color:white; padding:5px 10px; border-radius:4px; cursor:pointer;">Lançar</button></td>
+                </tr>
+            `;
+        });
+    }
+
+    function atribuirNota(i) {
+        db[i].nota = document.getElementById(`n-${i}`).value;
+        salvarDB();
+        alert("Nota atualizada!");
+    }
+
+    function encerrarSessao() {
+        if (papelLogado === 'aluno') {
+            let index = db.findIndex(a => a.nome === usuarioLogado);
+            if (index !== -1) {
+                db[index].tempo += segundosAtuais;
+                salvarDB();
+            }
+        }
+        clearInterval(timerInterval);
+        location.reload();
+    }
+
+    function salvarDB() { localStorage.setItem('cyberedu_v3', JSON.stringify(db)); }
+</script>
+</body>
+</html>
