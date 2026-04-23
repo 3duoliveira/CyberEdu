@@ -5,11 +5,24 @@
     <title>CyberEdu Pro - Plataforma Educacional</title>
     <style>
         body { margin: 0; font-family: 'Segoe UI', Arial; background: #0f172a; color: #fff; }
-        .login { display: flex; height: 100vh; justify-content: center; align-items: center; }
+        .login { display: flex; height: 100vh; justify-content: center; align-items: center; flex-direction: column; }
         .box { background: #1e293b; padding: 30px; border-radius: 10px; width: 320px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
         input, select { width: 100%; padding: 12px; margin: 10px 0; border-radius: 5px; border: 1px solid #334155; background: #0f172a; color: #fff; box-sizing: border-box; }
         button { width: 100%; padding: 12px; background: #22c55e; border: none; color: #fff; font-weight: bold; cursor: pointer; border-radius: 5px; margin-top: 10px; transition: 0.3s; }
         button:hover { background: #16a34a; }
+        
+        /* Estilo da Dica de Segurança */
+        .cyber-tip { 
+            background: rgba(59, 130, 246, 0.1); 
+            border: 1px dashed #3b82f6; 
+            color: #93c5fd; 
+            padding: 10px; 
+            font-size: 0.85em; 
+            border-radius: 5px; 
+            margin-bottom: 15px; 
+            text-align: center;
+        }
+
         .dashboard { display: none; padding: 20px; max-width: 1100px; margin: auto; }
         .card { background: #1e293b; padding: 20px; margin: 15px 0; border-radius: 12px; border-left: 5px solid #3b82f6; }
         .trilha-item { display: flex; justify-content: space-between; align-items: center; background: #334155; padding: 12px; margin: 8px 0; border-radius: 8px; }
@@ -27,6 +40,11 @@
 <div class="login" id="login-screen">
     <div class="box">
         <h2 style="text-align: center;">🛡️ CyberEdu Pro</h2>
+        
+        <div class="cyber-tip" id="dica-seguranca">
+            💡 Carregando dica de segurança...
+        </div>
+
         <input type="text" id="username" placeholder="Seu Nome Completo">
         <select id="userRole">
             <option value="aluno">Sou Aluno</option>
@@ -38,14 +56,12 @@
 
 <div class="dashboard" id="main-dashboard">
     <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h1 id="txt-welcome"></h1>
         <div id="area-cabecalho">
-    <h1 id="txt-welcome">Você chegou ao melhor sistema de educação cibernética!</h1>
-    
-    <p style="color: hwb(0 100% 0%); font-size: 0.9em; max-width: 600px; margin-top: 10px;line-height: 1.6;">
-        Bem-vindo à sua jornada de capacitação digital. O <strong>CyberEdu Pro</strong> é um ambiente seguro projetado para transformar a curiosidade em conhecimento técnico. Explore as trilhas abaixo e acompanhe seu tempo de estudo.
-    </p>
-</div>
+            <h1 id="txt-welcome"></h1>
+            <p style="color: #cbd5e1; font-size: 0.9em; max-width: 600px; margin-top: 10px;line-height: 1.6;">
+                Bem-vindo à sua jornada de capacitação digital. O <strong>CyberEdu Pro</strong> é um ambiente seguro projetado para transformar a curiosidade em conhecimento técnico.
+            </p>
+        </div>
         <div id="area-timer" style="display:none;" class="timer-badge">
             ⏱️ Estudo: <span id="sessao-timer">00:00</span>
         </div>
@@ -77,18 +93,6 @@
                 </div>
             </div>
         </div>
-
-        <div class="card" style="border-left-color: #f97316;">
-            <h3>📖 Leituras Rápidas (Artigos)</h3>
-            <div class="trilha-item">
-                <span>O que é Phishing? (Guia Simples)</span>
-                <button class="btn-link" onclick="registrar('Artigo Phishing', 'https://cartilha.cert.br/fasciculos/#phishing')">Ler Agora</button>
-            </div>
-            <div class="trilha-item">
-                <span>Dicas para Senhas Fortes</span>
-                <button class="btn-link" onclick="registrar('Artigo Senhas', 'https://cartilha.cert.br/fasciculos/#senhas')">Ler Agora</button>
-            </div>
-        </div>
     </div>
 
     <div id="area-professor" style="display:none;">
@@ -118,7 +122,25 @@
     let usuarioLogado = null;
     let papelLogado = null;
 
-    // Carrega dados ou inicia com o seu grupo do MBA
+    // Array de dicas de segurança
+    const dicas = [
+        "🔒 Sua senha é seu bem mais precioso. Não a compartilhe!",
+        "🕵️‍♂️ Desconfie de links urgentes recebidos por e-mail ou SMS.",
+        "📱 Use autenticação de dois fatores (MFA) em todas as suas contas.",
+        "🛡️ Mantenha seu sistema operacional e antivírus sempre atualizados.",
+        "🛑 Phishing é a arte de enganar. Fique atento a erros de português em sites.",
+        "💻 Nunca deixe seu computador desbloqueado em locais públicos."
+    ];
+
+    // Função para sortear dica
+    function sortearDica() {
+        const index = Math.floor(Math.random() * dicas.length);
+        document.getElementById('dica-seguranca').innerText = dicas[index];
+    }
+
+    // Chama a dica ao carregar a página
+    window.onload = sortearDica;
+
     let db = JSON.parse(localStorage.getItem('cyberedu_v3')) || [
         { nome: "Fabricio Reis", tempo: 3600, atividade: "Cisco", nota: "9.5" },
         { nome: "Fernando Caldas", tempo: 1800, atividade: "Interland", nota: "8.0" }
